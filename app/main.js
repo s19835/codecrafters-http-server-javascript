@@ -9,6 +9,8 @@ const server = net.createServer((socket) => {
     socket.on("data", (data) => {
         const request = data.toString();
         const requestLine = request.split('\r\n')[0];
+        const headerLine = request.split('\r\n')[1];
+        const userAgent = headerLine.split('\r\n')[1];
         const urlPath = requestLine.split(' ')[1];
         let response;
         let str = urlPath.substring(6);
@@ -17,8 +19,8 @@ const server = net.createServer((socket) => {
         } else {
             response = '404 Not Found';
         }
-        
-        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
+
+        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str} ${userAgent.substring(11)}`);
     })
     
 
