@@ -13,8 +13,8 @@ const server = net.createServer((socket) => {
         const requestArray = request.split('\r\n');
         const requestLine = requestArray[0];
         
-        let userAgent = requestArray.find(header => header.toLowerCase().startsWith('user-agent'));
-        userAgent = userAgent.split(': ')[1];
+        const userAgentArray = requestArray.find(header => header.toLowerCase().startsWith('user-agent'));
+        let userAgent = userAgentArray.split(': ')[1];
 
         const urlPath = requestLine.split(' ')[1];
         
