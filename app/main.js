@@ -20,7 +20,7 @@ const server = net.createServer((socket) => {
             response = '404 Not Found';
         }
 
-        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str} ${userAgent.substring(11)}`);
+        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${userAgent.substring(11)}`);
     })
     
 
