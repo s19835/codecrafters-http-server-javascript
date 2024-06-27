@@ -8,10 +8,9 @@ const server = net.createServer((socket) => {
 
     socket.on("data", (data) => {
         const request = data.toString();
-        const urlPath = request.split('\r\n')[1];
-        let response;
-        if (urlPath === '/') response = '200 OK'
-        else response = '404 Not Found';
+        const requestLine = request.split('\r\n')[0];
+        const urlPath = requestLine.split(' ')[1];
+        let response = (urlPath === '/') ? '200 OK' : '404 Not Found';
         socket._write(`HTTP/1.1 ${response}\r\n\r\n`);
     })
     
