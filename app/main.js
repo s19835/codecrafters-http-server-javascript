@@ -12,10 +12,7 @@ const server = net.createServer((socket) => {
         const urlPath = requestLine.split(' ')[1];
         let response;
         let str = urlPath.substring(6);
-        if (urlPath === '/') {
-            response = '200 OK';
-        }
-        else if (urlPath.startsWith('/echo/')) {
+        if (urlPath.startsWith('/echo/') || urlPath === '/') {
             response = '200 OK';
         } else {
             response = '404 Not Found';
