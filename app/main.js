@@ -33,7 +33,7 @@ const server = net.createServer((socket) => {
         else if (urlPath === '/user-agent') {
             response = '200 OK';
             socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`);
-            console.log(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`);
+            
         }
         else {
             response = '404 Not Found';
