@@ -23,7 +23,7 @@ const server = net.createServer((socket) => {
 
         //find the user-agent from the array request
         const agent = request.find((user) => {
-            const user = user.startsWith('User-Agent');
+            user.startsWith('User-Agent');
         })
 
         const userAgent = agent.split(': ')[1];
