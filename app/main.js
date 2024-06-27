@@ -14,21 +14,21 @@ const server = net.createServer((socket) => {
         const requestLine = requestArray[0];
         
         const userAgentArray = requestArray.find(header => header.toLowerCase().startsWith('user-agent'));
-        let userAgent = userAgentArray.split(': ')[1];
+        let userAgent = userAgentArray ? userAgentArray.split(': ')[1] : '';
 
         const urlPath = requestLine.split(' ')[1];
         
         let response;
         let str = urlPath;
+        str = urlPath.substring(6);
         
         if (urlPath.startsWith('/echo/')) {
-            str = urlPath.substring(6);
             response = '200 OK';
             socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
         } 
         else if (urlPath === '/') {
             response = '200 OK';
-            socket._write(`HTTP/1.1 ${response}\r\n`);
+            socket._write(`HTTP/1.1 ${response}\r\n\r\n`);
         }
         else if (urlPath === '/user-agent') {
             response = '200 OK';
