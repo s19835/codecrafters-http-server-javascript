@@ -7,40 +7,39 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((socket) => {
 
     socket.on("data", (data) => {
-        socket.on("data", (data) => {
-            const request = data.toString();
-            const requestLines = request.split('\r\n');
-            const requestLine = requestLines[0];
-            const headers = requestLines.slice(1, requestLines.indexOf(''));
-            const urlPath = requestLine.split(' ')[1];
-    
-            let response;
-            let responseBody;
-            let statusCode;
-    
-            // Extract the User-Agent header
-            const userAgentHeader = headers.find(header => header.toLowerCase().startsWith('user-agent:'));
-            const userAgent = userAgentHeader ? userAgentHeader.split(': ')[1] : '';
-    
-            if (urlPath === '/user-agent') {
-                statusCode = '200 OK';
-                responseBody = userAgent;
-            } else {
-                statusCode = '404 Not Found';
-                responseBody = 'Not Found';
-            }
-    
-            const responseHeaders = `HTTP/1.1 ${statusCode}\r\n` +
-                                    `Content-Type: text/plain\r\n` +
-                                    `Content-Length: ${responseBody.length}\r\n` +
-                                    `\r\n`;
-    
-            response = responseHeaders + responseBody;
-    
-            socket.write(response);
-        });
-    
+        const request = data.toString();
         
+
+        const requestArray = request.split('\r\n');
+        const requestLine = requestArray[0];
+        
+        let userAgent = requestArray.find(header => header.toLowerCase().startsWith('user-agent'));
+        userAgent = userAgent.split(': ')[1];
+
+        const urlPath = requestLine.split(' ')[1];
+        
+        let response;
+        let str = urlPath.substring(6);
+        
+        
+        if (urlPath.startsWith('/echo/')) {
+            response = '200 OK';
+            socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
+        } 
+        else if (urlPath === '/') {
+            response = '200 OK';
+            socket._write(`HTTP/1.1 ${response}\r\n`);
+        }
+        else if (urlPath === '/user-agent') {
+            response = '200 OK';
+            socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${userAgent}`);
+        }
+        else {
+            response = '404 Not Found';
+            socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
+        }
+
+       
     })
     
 
