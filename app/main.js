@@ -39,9 +39,14 @@ const server = net.createServer((socket) => {
         
         const requestMethod = requestLine.split(' ')[0];
 
-        const encoding = requestArray[2] ? requestArray[2].split(': ')[1]: '';
-        console.log('encoding: ', encoding);
+        // const encoding = requestArray[2] ? requestArray[2].split(': ')[1]: '';
+        const encodingHeader = requestArray.find((e) => 
+            e.startsWith("Accept-Encoding")
+        );
 
+        let encoding = encodingHeader ? encodingHeader.split(': ')[1] : '';
+        encoding = encoding ? encoding.split(', ').find((gzip) => gzip === 'gzip'): '';
+        console.log('endocing: ', encoding);
 
         
 
@@ -49,10 +54,10 @@ const server = net.createServer((socket) => {
             if (urlPath.startsWith('/echo/')) {
                 response = '200 OK';
                 if (encoding) {
-                
+                    
+                    //find gzip whether exit in the array encodingArray
                     if (encoding === 'gzip') {
                         socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\n\r\n`);
-                        console.log(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\n\r\n`);
                     } else {
                         socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\n\r\n`);
                     }
