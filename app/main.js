@@ -1,6 +1,7 @@
 import * as net from "net";
 import { join } from "path";
 import { readFile, writeFile } from "fs";
+import { gzip } from "zlib";
 
 
 console.log("Logs from your program will appear here!");
@@ -26,6 +27,7 @@ const server = net.createServer((socket) => {
         
 
         const requestArray = request.split('\r\n');
+        console.log(requestArray);
         const requestLine = requestArray[0];
         
         const userAgentArray = requestArray.find(header => header.toLowerCase().startsWith('user-agent'));
@@ -36,7 +38,8 @@ const server = net.createServer((socket) => {
         let response;
         let str = urlPath;
         str = urlPath.substring(6);
-        
+       
+
         const requestMethod = requestLine.split(' ')[0];
 
         // const encoding = requestArray[2] ? requestArray[2].split(': ')[1]: '';
@@ -54,10 +57,16 @@ const server = net.createServer((socket) => {
             if (urlPath.startsWith('/echo/')) {
                 response = '200 OK';
                 if (encoding) {
-                    
                     //find gzip whether exit in the array encodingArray
                     if (encoding === 'gzip') {
-                        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\n\r\n`);
+                        gzip(str, (err, buffer) => {
+                            if (!err) {
+                                const compressedData = buffer.toString('hex').toUpperCase();
+                                socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\nContent-Length: ${buffer.length}\r\n\r\n${compressedData}`);
+                                console.log(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\nContent-Length: ${buffer.length}\r\n\r\n${compressedData}`);
+                            }
+                        });
+                        
                     } else {
                         socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\n\r\n`);
                     }
