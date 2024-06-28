@@ -1,7 +1,7 @@
 import * as net from "net";
 import { join } from "path";
 import { readFile, writeFile } from "fs";
-import { gzip } from "zlib";
+import { gzipSync } from "zlib";
 
 
 console.log("Logs from your program will appear here!");
@@ -27,7 +27,6 @@ const server = net.createServer((socket) => {
         
 
         const requestArray = request.split('\r\n');
-        console.log(requestArray);
         const requestLine = requestArray[0];
         
         const userAgentArray = requestArray.find(header => header.toLowerCase().startsWith('user-agent'));
@@ -49,7 +48,6 @@ const server = net.createServer((socket) => {
 
         let encoding = encodingHeader ? encodingHeader.split(': ')[1] : '';
         encoding = encoding ? encoding.split(', ').find((gzip) => gzip === 'gzip'): '';
-        console.log('endocing: ', encoding);
 
         
 
@@ -59,14 +57,9 @@ const server = net.createServer((socket) => {
                 if (encoding) {
                     //find gzip whether exit in the array encodingArray
                     if (encoding === 'gzip') {
-                        gzip(str, (err, buffer) => {
-                            if (!err) {
-                                const compressedData = buffer.toString('hex').toUpperCase();
-                                socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\nContent-Length: ${buffer.length}\r\n\r\n${compressedData}`);
-                                console.log(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\nContent-Length: ${buffer.length}\r\n\r\n${compressedData}`);
-                            }
-                        });
-                        
+                        const buffer = gzipSync(str);
+                        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\nContent-Length: ${buffer.length}\r\n\r\n`);
+                        socket._write(buffer);
                     } else {
                         socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\n\r\n`);
                     }
