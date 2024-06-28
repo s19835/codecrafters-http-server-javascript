@@ -39,11 +39,27 @@ const server = net.createServer((socket) => {
         
         const requestMethod = requestLine.split(' ')[0];
 
+        const encoding = requestArray[2] ? requestArray[2].split(': ')[1]: '';
+        console.log('encoding: ', encoding);
+
+
+        
 
         if (requestMethod === 'GET') {
             if (urlPath.startsWith('/echo/')) {
                 response = '200 OK';
-                socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
+                if (encoding) {
+                
+                    if (encoding === 'gzip') {
+                        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\n\r\n`);
+                        console.log(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Encoding: ${encoding}\r\n\r\n`);
+                    } else {
+                        socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\n\r\n`);
+                    }
+                } else {
+                    socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
+                    
+                }
             } 
             else if (urlPath === '/') {
                 response = '200 OK';
@@ -69,6 +85,7 @@ const server = net.createServer((socket) => {
                 });
                 //HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: 14\r\n\r\nHello, World!
             }
+
             else {
                 response = '404 Not Found';
                 socket._write(`HTTP/1.1 ${response}\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
